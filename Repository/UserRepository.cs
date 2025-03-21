@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using SignUpAuthentication.Controllers;
 using SignUpAuthentication.Data;
 using SignUpAuthentication.Model;
 using System.Security.Cryptography;
@@ -9,17 +8,14 @@ namespace SignUpAuthentication.UserRepositories
 {
     public class UserRepository : IUserRepository
     {
-       // private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly AuthenticationDbContext _authenticationDbContext;
         public UserRepository( AuthenticationDbContext authenticationDbContext, IMapper mapper)
         {
-           
             _authenticationDbContext = authenticationDbContext ?? throw new ArgumentException(nameof(authenticationDbContext));
             _mapper = mapper;
         }
         //  public static List<User> _users = new List<User>();
-
         public async Task<User> Authenticate(string username, string password)
         {
             var userDb = await _authenticationDbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -46,7 +42,6 @@ namespace SignUpAuthentication.UserRepositories
                 return null;
             }
             return user;
-
         }
         private bool MatchPasswordHash(string password, byte[] PasswordHash, byte[] PasswordKey)
         {
@@ -60,7 +55,6 @@ namespace SignUpAuthentication.UserRepositories
                 }
                 return true;
             }
-
         }
         public async Task Register(string username, string password, string phoneNumber)
         {
@@ -74,19 +68,15 @@ namespace SignUpAuthentication.UserRepositories
                 passwordKey = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
-
             var userDb = new UserDb
             {
             Username = username,
             PasswordHash = passwordHash,
             PasswordKey = passwordKey,
             PhoneNumber = phoneNumber 
-            
         };
-
             await _authenticationDbContext.Users.AddAsync(userDb);
             await _authenticationDbContext.SaveChangesAsync();
-
         }
         public async Task<User> GetUser(string username)
         {
